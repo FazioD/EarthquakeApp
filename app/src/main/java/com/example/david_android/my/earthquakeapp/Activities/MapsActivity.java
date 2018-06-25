@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.david_android.my.earthquakeapp.Model.EarthQuake;
 import com.example.david_android.my.earthquakeapp.R;
 import com.example.david_android.my.earthquakeapp.Util.Constants;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,11 +28,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Date;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -61,7 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
 
 
-    locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -84,7 +88,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
-        if (Build.VERSION.SDK_INT <23) {
+        if (Build.VERSION.SDK_INT < 23) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
         } else {
             if (ContextCompat.checkSelfPermission(this,
@@ -132,6 +146,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void getEarthQuakes() {
+
+        final EarthQuake earthQuake = new EarthQuake();
+
+
             JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, Constants.URL, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
@@ -150,7 +168,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             double lon = coordinates.getDouble(0);
                             double lat = coordinates.getDouble(1);
 
-                            Log.d("Quake", lon + ", " + lat);
+                            //Log.d("Quake", lon + ", " + lat);
+                            earthQuake.setPlace(properties.getString("place"));
+                            earthQuake.setType(properties.getString("type"));
+                            earthQuake.setTime(properties.getLong("time"));
+                            earthQuake.setMagnitude(properties.getDouble("mag"));
+                            earthQuake.setDetailLink(properties.getString("detail"));
+
+                            java.text.DateFormat dateFormat = java.text.DateFormat.getInstance();
+                            String formattedDate = dateFormat.format(new Date(Long.valueOf(properties.getLong("time")))
+                            .getTime());
+
+                            MarkerOptions markerOptions = new MarkerOptions();
+
+                            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                            markerOptions.title(earthQuake.getPlace());
+                            markerOptions.position(new LatLng(lat, lon));
+                            markerOptions.snippet("Magnitude: " +
+                                earthQuake.getMagnitude() + "\n" +
+                                "Date: "+ formattedDate);
+
+                            Marker marker = mMap.addMarker(markerOptions);
+                            marker.setTag(earthQuake.getDetailLink());
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), 1));
 
                         }
                     } catch (JSONException e ) {
