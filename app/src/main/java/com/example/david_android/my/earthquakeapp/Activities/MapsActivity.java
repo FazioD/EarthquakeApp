@@ -1,6 +1,7 @@
 package com.example.david_android.my.earthquakeapp.Activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,6 +13,10 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -46,6 +51,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
     private LocationListener locationListener;
     private RequestQueue queue;  //queue up request from volley lib
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog dialog;
 
 
     @Override
@@ -263,6 +270,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
         queue.add(jsonObjectRequest);
+    }
+
+    public void getMoreDetails(String url) {
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                dialogBuilder = new AlertDialog.Builder(MapsActivity.this);
+                View view = getLayoutInflater().inflate(R.layout.popup, null);
+
+                Button dismissButton = (Button) view.findViewById(R.id.dimissPop);
+                Button dismissButtonTop = (Button) view.findViewById(R.id.dimissPopTop);
+                TextView popList = (TextView) view.findViewById(R.id.popList);
+                WebView htmlPop = = (WebView) view.findViewById(R.id.htmlWebview);
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+        queue.add(jsonObjectRequest);
+
     }
 
     @Override
