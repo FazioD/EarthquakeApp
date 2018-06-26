@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.david_android.my.earthquakeapp.Model.EarthQuake;
 import com.example.david_android.my.earthquakeapp.R;
+import com.example.david_android.my.earthquakeapp.UI.CustominfoWindow;
 import com.example.david_android.my.earthquakeapp.Util.Constants;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,7 +39,8 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMarkerClickListener{
 
     private GoogleMap mMap;
     private LocationManager locationManager;
@@ -63,6 +66,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        mMap.setInfoWindowAdapter(new CustominfoWindow(getApplicationContext()));
+        mMap.setOnInfoWindowClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+
 
 
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
@@ -206,6 +214,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             });
             queue.add(jsonObjectRequest);
 
+
         }
 
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+
+        Toast.makeText(getApplicationContext(), marker.getTitle().toString(), Toast.LENGTH_LONG)
+                .show();
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
 }
