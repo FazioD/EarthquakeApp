@@ -220,8 +220,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onInfoWindowClick(Marker marker) {
 
-        Toast.makeText(getApplicationContext(), marker.getTitle().toString(), Toast.LENGTH_LONG)
-                .show();
+        getQuakeDetails(marker.getTag().toString());
+
+//        Toast.makeText(getApplicationContext(), marker.getTag().toString(), Toast.LENGTH_LONG)
+//                .show();
+    }
+
+    private void getQuakeDetails(String url) {
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                String detailsUrl = "";
+
+                try {
+                    JSONObject properties = response.getJSONObject("properties");
+                    JSONObject products = properties.getJSONObject("products");
+                    JSONArray geoserve = products.getJSONArray("geoserve");
+
+                    for (int i=0; i < geoserve.length(); i++) {
+                        JSONObject geoservObj = geoserve.getJSONObject(i);
+
+                        JSONObject contentObj = geoservObj.getJSONObject("contents");
+                        JSONObject geoJsonObj = contentObj.getJSONObject("geoserve.json");
+
+                        detailsUrl  = geoJsonObj.getString("url");
+                    }
+                    Log.d("URL: ", detailsUrl);
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        queue.add(jsonObjectRequest);
     }
 
     @Override
