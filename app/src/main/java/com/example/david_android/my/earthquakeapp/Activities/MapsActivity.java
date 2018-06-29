@@ -257,6 +257,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                     Log.d("URL: ", detailsUrl);
 
+                    getMoreDetails(detailsUrl);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -284,7 +286,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Button dismissButton = (Button) view.findViewById(R.id.dimissPop);
                 Button dismissButtonTop = (Button) view.findViewById(R.id.dimissPopTop);
                 TextView popList = (TextView) view.findViewById(R.id.popList);
-                WebView htmlPop = = (WebView) view.findViewById(R.id.htmlWebview);
+                WebView htmlPop = (WebView) view.findViewById(R.id.htmlWebview);
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                try {
+
+                    if (response.has("tectonicSummary") && response.getString("tectonicSummary") != null) {
+
+                        JSONObject tectonic = response.getJSONObject("tectonicSummary");
+
+                        if(tectonic.has("text")&& tectonic.getString("text") != null) {
+
+                            String text = tectonic.getString("text");
+
+                        }
+                    }
+
+                    JSONArray cities = response.getJSONArray("cities");
+
+                    for (int i = 0; i < cities.length(); i++) {
+                        JSONObject citiesObj = cities.getJSONObject(i);
+
+                        stringBuilder.append("City: " + citiesObj.getString("name")
+                        + "\n" + "Distance: " + citiesObj.getString("distance")
+                        + "\n" + "Population:"
+                        + citiesObj.getString("population"));
+
+                        stringBuilder.append("\n\n");
+
+                    }
+
+                    popList.setText(stringBuilder);
+
+                    dismissButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    dismissButtonTop.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialogBuilder.setView(view);
+                    dialog = dialogBuilder.create();
+                    dialog.show();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         }, new Response.ErrorListener() {
