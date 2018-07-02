@@ -300,6 +300,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             String text = tectonic.getString("text");
 
+                            htmlPop.loadDataWithBaseURL(null, text, "text/html", "UTF-8", null );
+
                         }
                     }
 
