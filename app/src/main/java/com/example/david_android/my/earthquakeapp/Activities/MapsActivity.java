@@ -2,6 +2,7 @@ package com.example.david_android.my.earthquakeapp.Activities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -57,6 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private AlertDialog.Builder dialogBuilder;
     private AlertDialog dialog;
     private BitmapDescriptor[] iconColors;
+    private Button showListBtn;
 
 
     @Override
@@ -67,6 +69,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        showListBtn = (Button) findViewById(R.id.showListBtn);
+
+        showListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MapsActivity.this, QuakesListActivity.class ));
+            }
+        });
 
         iconColors = new BitmapDescriptor[]{
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE),
@@ -81,7 +92,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         };
-
 
         queue = Volley.newRequestQueue(this);
 
