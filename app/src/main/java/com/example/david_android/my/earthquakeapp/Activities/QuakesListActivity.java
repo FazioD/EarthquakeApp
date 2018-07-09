@@ -57,7 +57,6 @@ public class QuakesListActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
 
-
             //from here...
 
                 EarthQuake earthQuake = new EarthQuake();
